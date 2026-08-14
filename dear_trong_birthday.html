@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dear Trọng 💌</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; overflow:hidden;
+    font-family:"Trebuchet MS",Arial,sans-serif;
+    background:linear-gradient(135deg,#fff1f7,#fff9dc 45%,#e8f8ff);
+    display:flex; align-items:center; justify-content:center;
+    color:#4b4050;
+  }
+  .scene{width:100%;height:100vh;position:relative;display:flex;align-items:center;justify-content:center}
+  .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.7;animation:float 5s ease-in-out infinite}
+  .b1{width:180px;height:180px;background:#ffd0e1;left:-45px;top:8%}
+  .b2{width:220px;height:220px;background:#c9edff;right:-70px;bottom:2%;animation-delay:1s}
+  .b3{width:100px;height:100px;background:#ffe89a;right:15%;top:8%;animation-delay:2s}
+  @keyframes float{50%{transform:translateY(-14px) rotate(5deg)}}
+  .confetti{position:absolute;inset:0;pointer-events:none}
+  .confetti span{position:absolute;font-size:22px;animation:drift 6s linear infinite}
+  @keyframes drift{0%{transform:translateY(-30px) rotate(0);opacity:0}15%{opacity:1}100%{transform:translateY(105vh) rotate(360deg);opacity:.2}}
+
+  .envelope-wrap{position:relative;z-index:5;cursor:pointer;transition:.5s}
+  .envelope-wrap.opened{transform:scale(.78) translateY(120px);opacity:0;pointer-events:none}
+  .hint{
+    position:absolute;bottom:-62px;width:100%;text-align:center;
+    font-weight:bold;color:#c75c88;animation:bob 1.5s ease-in-out infinite;
+  }
+  @keyframes bob{50%{transform:translateY(-5px)}}
+  .envelope{
+    width:330px;height:220px;position:relative;
+    filter:drop-shadow(0 18px 22px rgba(116,76,100,.18));
+  }
+  .env-back{position:absolute;inset:0;background:#ff8fb5;border-radius:12px}
+  .paper{
+    position:absolute;width:84%;height:85%;left:8%;top:3%;
+    background:#fffdf8;border-radius:8px;padding:18px;
+    color:#777;font-size:13px;text-align:center;
+  }
+  .front{
+    position:absolute;bottom:0;left:0;width:0;height:0;
+    border-left:165px solid transparent;border-right:165px solid transparent;
+    border-bottom:125px solid #ff719f;
+  }
+  .flap{
+    position:absolute;top:0;left:0;width:0;height:0;
+    border-left:165px solid transparent;border-right:165px solid transparent;
+    border-top:125px solid #ffb0c9;
+    transform-origin:top;transition:1s;z-index:4;
+  }
+  .opened .flap{transform:rotateX(180deg);z-index:1}
+  .seal{
+    position:absolute;z-index:6;left:50%;top:55%;transform:translate(-50%,-50%);
+    width:58px;height:58px;border-radius:50%;background:#ff4f87;color:white;
+    display:flex;align-items:center;justify-content:center;font-size:25px;
+    box-shadow:0 5px 12px #d44b76aa;
+    transition:.5s;
+  }
+  .opened .seal{opacity:0;transform:translate(-50%,-50%) scale(.2)}
+
+  .letter{
+    position:absolute;z-index:10;width:min(680px,90vw);height:min(82vh,760px);
+    background:#fffdf8;border:4px solid #ffb5ca;border-radius:22px;
+    box-shadow:0 25px 70px rgba(82,48,70,.25);
+    padding:42px 38px 34px;overflow:auto;
+    transform:translateY(100vh) rotate(2deg);opacity:0;
+    transition:1s cubic-bezier(.2,.85,.2,1);
+  }
+  .letter.show{transform:translateY(0) rotate(0);opacity:1}
+  .letter:before{
+    content:"";position:absolute;inset:12px;border:2px dashed #ffd0df;
+    border-radius:14px;pointer-events:none;
+  }
+  .letter h1{
+    text-align:center;color:#e95788;margin:0 0 20px;font-size:clamp(28px,6vw,44px);
+    font-family:Georgia,serif;
+  }
+  .letter .intro{text-align:center;font-weight:bold;color:#d76a92;margin-bottom:25px}
+  .letter p{font-size:16px;line-height:1.8;margin:0 0 15px;position:relative;z-index:1}
+  .signature{
+    margin-top:28px;text-align:right;font-family:cursive;font-size:25px;color:#d95787;
+    position:relative;z-index:1;
+  }
+  .tiny{font-size:13px;color:#9b8290;text-align:center;margin-top:18px}
+  .close{
+    position:sticky;float:right;top:0;z-index:3;border:0;background:#ffe1eb;
+    color:#bd4f78;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;
+  }
+  .sparkle{position:absolute;z-index:20;pointer-events:none;font-size:24px;animation:pop 1s ease-out forwards}
+  @keyframes pop{0%{transform:scale(.2);opacity:0}30%{opacity:1}100%{transform:translate(var(--x),var(--y)) rotate(180deg);opacity:0}}
+  @media(max-width:500px){
+    .envelope{transform:scale(.78)}
+    .envelope-wrap.opened{transform:scale(.65) translateY(120px)}
+    .letter{padding:34px 24px 26px}
+    .letter p{font-size:15px;line-height:1.7}
+  }
+</style>
+</head>
+<body>
+<div class="scene">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="confetti" id="confetti"></div>
+
+  <div class="envelope-wrap" id="envelopeWrap" onclick="openLetter()">
+    <div class="envelope" id="envelope">
+      <div class="env-back"></div>
+      <div class="paper">Có một lá thư nhỏ gửi cho<br><b>chàng trai tuổi 20 ✨</b></div>
+      <div class="flap"></div>
+      <div class="front"></div>
+      <div class="seal">💌</div>
+    </div>
+    <div class="hint">click vào đây nè 👆</div>
+  </div>
+
+  <article class="letter" id="letter">
+    <button class="close" onclick="closeLetter(event)">×</button>
+    <h1>Happy 20th Birthday 🎂</h1>
+    <div class="intro">Đây rồi đây rồi, chàng trai của tuổi 20.</div>
+
+    <p>Tuổi mới tui chúc Trọng sẽ có thêm những gian nan mới để vượt qua và hoàn thành xuất sắc một lần nữa. Tui nghĩ đôi khi những điều khó khăn xuất hiện trong cuộc sống cũng không hẳn là điều xấu, vì chính những lúc đó mới làm mình trưởng thành hơn, mạnh mẽ hơn và biết mình thật sự muốn gì.</p>
+
+    <p>Gian nan sẽ làm đôi chân Trọng vững bước hơn. Từng bước, từng bước, nhưng dậm thật mạnh và để lại dấu chân của mình vào đời. Không cần phải vội, cũng chẳng cần phải giống bất kỳ ai, cứ đi theo con đường mà Trọng chọn, miễn là sau này nhìn lại vẫn thấy đó là những bước chân của chính mình.</p>
+
+    <p>Chúc Trọng trước hết là thật nhiều sức khỏe, khỏe cơ thể và khỏe cả tinh thần. Mong Trọng có đủ sức để theo đuổi những điều mình muốn, đủ kiên nhẫn để đi qua những lúc mệt mỏi, và cũng có thật nhiều những ngày bình yên để tận hưởng những gì mình đã cố gắng.</p>
+
+    <p>Chúc Trọng tuổi mới có thêm nhiều trải nghiệm, nhiều niềm vui, nhiều chuyến đi và thật nhiều câu chuyện để sau này nhắc lại còn có cái mà cười với nhau. Mong những dự định của Trọng từng chút từng chút đều thành hiện thực, những gì đang cố gắng hôm nay rồi sẽ có ngày cho Trọng một câu trả lời xứng đáng.</p>
+
+    <p>Và tui cũng mong Trọng sẽ luôn gặp được những người thật lòng với mình, những người có thể cùng nhau đi qua những năm tháng đẹp nhất của tuổi trẻ. Có thể sau này mỗi đứa sẽ có một con đường riêng, bận rộn với cuộc sống riêng, nhưng mong rằng những tình bạn và những kỷ niệm của những năm tháng này vẫn sẽ là một phần thật đẹp khi Trọng nhớ về.</p>
+
+    <p>20 tuổi rồi, chúc Trọng cứ sống hết mình một chút, cứ thử những điều mình muốn, cứ sai rồi sửa, cứ thất bại rồi đứng lên. Vì sau cùng, tuổi trẻ cũng chỉ đến một lần.</p>
+
+    <p>Chúc mừng sinh nhật Trọng. Mong tuổi 20 của Trọng thật đẹp, không phải vì mọi thứ đều suôn sẻ, mà vì dù có chuyện gì xảy ra, Trọng vẫn luôn có đủ bản lĩnh để bước tiếp và đủ người bên cạnh để những ngày khó khăn trở nên nhẹ hơn.</p>
+
+    <div class="signature">Dear Trọng,<br><span>Kỳ 💗</span></div>
+    <div class="tiny">Một lá thư nhỏ, nhưng gửi bằng cả tấm lòng.</div>
+  </article>
+</div>
+
+<script>
+const confetti = document.getElementById("confetti");
+const symbols = ["🎈","✨","🌸","💗","⭐","🎀","🍰","💫","🫧"];
+for(let i=0;i<28;i++){
+  const s=document.createElement("span");
+  s.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+  s.style.left=Math.random()*100+"%";
+  s.style.animationDelay=(Math.random()*6)+"s";
+  s.style.animationDuration=(4+Math.random()*5)+"s";
+  s.style.fontSize=(14+Math.random()*14)+"px";
+  confetti.appendChild(s);
+}
+function burst(){
+  const icons=["✨","💗","🎉","⭐","🌸"];
+  for(let i=0;i<18;i++){
+    const x=document.createElement("div");
+    x.className="sparkle";
+    x.textContent=icons[Math.floor(Math.random()*icons.length)];
+    x.style.left="50%";x.style.top="50%";
+    x.style.setProperty("--x",(Math.random()*500-250)+"px");
+    x.style.setProperty("--y",(Math.random()*400-200)+"px");
+    document.body.appendChild(x);
+    setTimeout(()=>x.remove(),1000);
+  }
+}
+function openLetter(){
+  document.getElementById("envelope").classList.add("opened");
+  document.getElementById("envelopeWrap").classList.add("opened");
+  setTimeout(()=>document.getElementById("letter").classList.add("show"),450);
+  burst();
+}
+function closeLetter(e){
+  e.stopPropagation();
+  document.getElementById("letter").classList.remove("show");
+  setTimeout(()=>{
+    document.getElementById("envelopeWrap").classList.remove("opened");
+    document.getElementById("envelope").classList.remove("opened");
+  },500);
+}
+</script>
+</body>
+</html>
